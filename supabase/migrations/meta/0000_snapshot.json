@@ -1,0 +1,351 @@
+{
+  "id": "47a36508-c69d-4484-8228-2b2cfff82ec8",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.jugadores_salas_table": {
+      "name": "jugadores_salas_table",
+      "schema": "",
+      "columns": {
+        "sala_id": {
+          "name": "sala_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jugador_id": {
+          "name": "jugador_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "balance": {
+          "name": "balance",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "jugadores_salas_table_sala_id_salas_table_id_fk": {
+          "name": "jugadores_salas_table_sala_id_salas_table_id_fk",
+          "tableFrom": "jugadores_salas_table",
+          "tableTo": "salas_table",
+          "columnsFrom": [
+            "sala_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "jugadores_salas_table_jugador_id_jugadores_table_id_fk": {
+          "name": "jugadores_salas_table_jugador_id_jugadores_table_id_fk",
+          "tableFrom": "jugadores_salas_table",
+          "tableTo": "jugadores_table",
+          "columnsFrom": [
+            "jugador_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "jugadores_salas_table_sala_id_jugador_id_pk": {
+          "name": "jugadores_salas_table_sala_id_jugador_id_pk",
+          "columns": [
+            "sala_id",
+            "jugador_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "balance_check1": {
+          "name": "balance_check1",
+          "value": "\"jugadores_salas_table\".\"balance\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.jugadores_table": {
+      "name": "jugadores_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "jugadores_table_email_unique": {
+          "name": "jugadores_table_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.salas_table": {
+      "name": "salas_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "codigo_sala": {
+          "name": "codigo_sala",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "visualizacion": {
+          "name": "visualizacion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PUBLICA'"
+        },
+        "estado": {
+          "name": "estado",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ABIERTA'"
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "closed_at": {
+          "name": "closed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": null
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "salas_table_created_by_jugadores_table_id_fk": {
+          "name": "salas_table_created_by_jugadores_table_id_fk",
+          "tableFrom": "salas_table",
+          "tableTo": "jugadores_table",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "salas_table_codigo_sala_unique": {
+          "name": "salas_table_codigo_sala_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "codigo_sala"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.transacciones_table": {
+      "name": "transacciones_table",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "sala_id": {
+          "name": "sala_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jugador_origen_id": {
+          "name": "jugador_origen_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jugador_destino_id": {
+          "name": "jugador_destino_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monto": {
+          "name": "monto",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "transacciones_table_sala_id_salas_table_id_fk": {
+          "name": "transacciones_table_sala_id_salas_table_id_fk",
+          "tableFrom": "transacciones_table",
+          "tableTo": "salas_table",
+          "columnsFrom": [
+            "sala_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "transacciones_table_jugador_origen_id_jugadores_table_id_fk": {
+          "name": "transacciones_table_jugador_origen_id_jugadores_table_id_fk",
+          "tableFrom": "transacciones_table",
+          "tableTo": "jugadores_table",
+          "columnsFrom": [
+            "jugador_origen_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "transacciones_table_jugador_destino_id_jugadores_table_id_fk": {
+          "name": "transacciones_table_jugador_destino_id_jugadores_table_id_fk",
+          "tableFrom": "transacciones_table",
+          "tableTo": "jugadores_table",
+          "columnsFrom": [
+            "jugador_destino_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
