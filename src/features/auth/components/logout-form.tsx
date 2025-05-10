@@ -13,7 +13,7 @@ export default function LogoutForm () {
 
   return (
     <Form action={formAction}>
-      <Button type='submit' disabled={isPending}>
+      <Button variant='destructive' type='submit' disabled={isPending}>
         {isPending ? 'Cerrando sesión...' : 'Cerrar sesión'}
       </Button>
     </Form>

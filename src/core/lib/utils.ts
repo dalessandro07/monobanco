@@ -1,5 +1,7 @@
+import { diffMinutes, format, type DateInput, type Format } from '@formkit/tempo'
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
 
 export function cn (...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -15,4 +17,51 @@ export const getURL = () => {
   url = url.startsWith('http') ? url : `https://${url}`
 
   return `${url}/auth/callback`
+}
+
+//* Strings
+export const randomName = (length: number) => {
+  const shortName = uniqueNamesGenerator({
+    dictionaries: [colors, animals],
+    length,
+    separator: ' ',
+  })
+
+  return shortName
+}
+
+//* Dates
+export const formatDate = (date: DateInput, formatStyle?: Format) => {
+  let finalStyle: Format = {
+    date: 'full',
+    time: 'short',
+  }
+
+  if (formatStyle) {
+    finalStyle = formatStyle
+  }
+
+  return format(date, finalStyle)
+}
+
+export const tiempoJuego = (closedAt: Date | null, createdAt: Date) => {
+  if (!closedAt) {
+    return {
+      minutosJuego: 0,
+      finalTextoJuego: 'Sin tiempo de juego'
+    }
+  }
+
+  // Calcular horas de juego
+  const minutosJuego = diffMinutes(closedAt, createdAt)
+  const horasJuego = Math.floor(minutosJuego / 60)
+
+  const finalTextoJuego = horasJuego > 0
+    ? `${horasJuego} hora${horasJuego > 1 ? 's' : ''} y ${minutosJuego % 60} minuto${minutosJuego % 60 > 1 ? 's' : ''}`
+    : 'Sin tiempo de juego'
+
+  return {
+    minutosJuego,
+    finalTextoJuego
+  }
 }

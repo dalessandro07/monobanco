@@ -1,3 +1,4 @@
+import Header from '@/core/components/layout/header'
 import { Toaster } from '@/core/components/ui/sonner'
 import { APP_DESCRIPTION, APP_NAME } from '@/core/lib/constants'
 import type { Metadata } from "next"
@@ -34,9 +35,15 @@ export default function RootLayout ({
       <head>
         <meta name="apple-mobile-web-app-title" content={APP_NAME} />
       </head>
-      <body className={`${monopolyFont.className} dark`}>
-        <div className='flex flex-col min-h-dvh p-5'>
+      <body className={`${monopolyFont.className}`}>
+        <div className='flex flex-col gap-5 p-5 min-h-dvh'>
+          <Header />
+
           {children}
+
+          <footer className='flex flex-col items-center justify-center'>
+            <p className='text-xs text-muted-foreground'>Desarrollador por AR</p>
+          </footer>
         </div>
 
         <Toaster richColors position='top-center' />

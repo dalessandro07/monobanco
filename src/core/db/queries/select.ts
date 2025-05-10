@@ -1,23 +1,50 @@
 import { db } from '@/core/db'
 import { jugadoresSalasTable, jugadoresTable, salasTable } from '@/core/db/schema'
-import { desc, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 
 //! SALAS
-export async function getAllSalas () {
+export async function getAllSalasActivas () {
   const salas = await db.select()
     .from(salasTable)
     .innerJoin(jugadoresTable, eq(salasTable.created_by, jugadoresTable.id))
+    .where(eq(salasTable.estado, 'ABIERTA'))
     .orderBy(desc(salasTable.created_at))
   return salas
 }
 
-export async function getAllSalasPorJugadorId (jugadorId: string) {
+export async function getAllSalasCerradasPorJugadorId (jugadorId: string) {
   const salas = await db.select()
     .from(salasTable)
-    .where(eq(salasTable.created_by, jugadorId))
+    .innerJoin(jugadoresTable, eq(salasTable.created_by, jugadoresTable.id))
+    .where(and(
+      eq(salasTable.created_by, jugadorId),
+      eq(salasTable.estado, 'CERRADA')
+    ))
     .orderBy(desc(salasTable.created_at))
 
   return salas
+}
+
+export async function getAllSalasAbiertasPorJugadorId (jugadorId: string) {
+  const salas = await db.select()
+    .from(salasTable)
+    .innerJoin(jugadoresTable, eq(salasTable.created_by, jugadoresTable.id))
+    .where(and(
+      eq(salasTable.created_by, jugadorId),
+      eq(salasTable.estado, 'ABIERTA')
+    ))
+    .orderBy(desc(salasTable.created_at))
+
+  return salas
+}
+
+export async function getSalaPorId (salaId: string) {
+  const sala = await db.select()
+    .from(salasTable)
+    .where(eq(salasTable.id, salaId))
+    .limit(1)
+
+  return sala[0]
 }
 
 //! JUGADORES

@@ -56,8 +56,8 @@ export const transaccionesTable = pgTable('transacciones_table', {
   updated_at: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 })
 
-export type InsertUsuario = typeof jugadoresTable.$inferInsert
-export type SelectUsuario = typeof jugadoresTable.$inferSelect
+export type InsertJugador = typeof jugadoresTable.$inferInsert
+export type SelectJugador = typeof jugadoresTable.$inferSelect
 
 export type InsertSala = typeof salasTable.$inferInsert
 export type SelectSala = typeof salasTable.$inferSelect
