@@ -1,3 +1,4 @@
+import { SALA_ESTADO, SALA_VISUALIZACION } from '@/core/lib/constants'
 import { sql } from 'drizzle-orm'
 import { check, pgTable, primaryKey, real, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
@@ -19,8 +20,8 @@ export const salasTable = pgTable('salas_table', {
     const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase()
     return randomCode
   }),
-  visualizacion: text('visualizacion', { enum: ['PUBLICA', 'PRIVADA'] }).notNull().default('PUBLICA'),
-  estado: text('estado', { enum: ['ABIERTA', 'CERRADA'] }).notNull().default('ABIERTA'),
+  visualizacion: text('visualizacion', { enum: [SALA_VISUALIZACION.PUBLICA, SALA_VISUALIZACION.PRIVADA] }).notNull().default(SALA_VISUALIZACION.PUBLICA),
+  estado: text('estado', { enum: [SALA_ESTADO.ABIERTA, SALA_ESTADO.CERRADA] }).notNull().default(SALA_ESTADO.ABIERTA),
   created_by: uuid('created_by').references(() => jugadoresTable.id),
   created_at: timestamp('created_at').notNull().defaultNow(),
   updated_at: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),

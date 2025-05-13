@@ -3,8 +3,9 @@
 import { eliminarJugadorDeSala, eliminarSala } from '@/core/db/queries/delete'
 import { agregarJugadorASala, crearJugador, crearSala } from '@/core/db/queries/insert'
 import { getJugadorPorId, getSalaActivaPorJugadorId } from '@/core/db/queries/select'
-import { cerrarSala } from '@/core/db/queries/update'
+import { cambiarVisualizacionSala, cerrarSala } from '@/core/db/queries/update'
 import type { SelectSala } from '@/core/db/schema'
+import type { SALA_VISUALIZACION } from '@/core/lib/constants'
 import { getUser } from '@/features/auth/actions'
 import { revalidatePath } from 'next/cache'
 
@@ -215,6 +216,68 @@ export async function actionEliminarSala (salaId: string, jugadorId: string) {
   } catch (error) {
     console.error('Error al eliminar la sala:', error)
     const message = error instanceof Error ? error.message : 'Error al eliminar la sala'
+
+    return {
+      success: false,
+      message
+    }
+  } finally {
+    revalidatePath('/')
+  }
+}
+
+export async function actionCambiarVisualizacionSala (salaId: string, visualizacion: SALA_VISUALIZACION) {
+  if (!salaId || !visualizacion) {
+    return {
+      success: false,
+      message: 'Faltan datos para cambiar la visualización de la sala'
+    }
+  }
+
+  try {
+    const data = await cambiarVisualizacionSala(salaId, visualizacion)
+
+    if (!data) throw new Error('No se pudo cambiar la visualización de la sala')
+
+    return {
+      success: true,
+      data,
+      message: 'Visualización de la sala cambiada correctamente'
+    }
+  } catch (error) {
+    console.error('Error al cambiar la visualización de la sala:', error)
+    const message = error instanceof Error ? error.message : 'Error al cambiar la visualización de la sala'
+
+    return {
+      success: false,
+      message
+    }
+  } finally {
+    revalidatePath('/')
+  }
+}
+
+export async function actionEliminarJugadorDeSala (salaId: string, jugadorId: string) {
+  if (!salaId || !jugadorId) {
+    return {
+      success: false,
+      message: 'Faltan datos para eliminar al jugador de la sala'
+    }
+  }
+
+  try {
+    const data = await eliminarJugadorDeSala(salaId, jugadorId)
+
+    if (!data) throw new Error('No se pudo eliminar al jugador de la sala')
+
+    return {
+      success: true,
+      message: 'Jugador eliminado de la sala correctamente',
+      data
+    }
+  } catch (error) {
+    console.error('Error al eliminar jugador de la sala:', error)
+    const message = error instanceof Error ? error.message : 'Error al eliminar jugador de la sala'
 
     return {
       success: false,

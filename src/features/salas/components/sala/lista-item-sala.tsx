@@ -6,8 +6,10 @@ import type { SelectSala } from '@/core/db/schema'
 import { SALA_ESTADO } from '@/core/lib/constants'
 import { formatAmount, formatDate, tiempoJuego } from '@/core/lib/utils'
 import { getUser } from '@/features/auth/actions'
+import BtnCambiarVisualizacion from '@/features/salas/components/sala/btn-cambiar-visualizacion'
 import BtnCerrar from '@/features/salas/components/sala/btn-cerrar'
 import BtnEliminar from '@/features/salas/components/sala/btn-eliminar'
+import BtnEliminarJugador from '@/features/salas/components/sala/btn-eliminar-jugador'
 import BtnIngresar from '@/features/salas/components/sala/btn-ingresar'
 
 export default async function ListaItemSala ({
@@ -64,6 +66,9 @@ export default async function ListaItemSala ({
               <Badge className='uppercase'>
                 {sala.visualizacion}
               </Badge>
+              {isOwner && (
+                <BtnCambiarVisualizacion salaId={sala.id} visualizacion={sala.visualizacion} />
+              )}
             </div>
           </div>
         </div>
@@ -71,21 +76,32 @@ export default async function ListaItemSala ({
 
       <CardContent>
         <div className='flex flex-col gap-2'>
-          <h4 className="text-sm font-semibold">Jugadores:</h4>          <div className="space-y-2">
-            {jugadores.map((jugador, index) => (
-              <div key={jugador.id} className="flex items-center gap-2">
-                <p>{index + 1}. </p>
-                <Avatar className="w-6 h-6">
-                  <AvatarFallback className="text-xs">{jugador.nombre.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <span className="text-sm">
-                  {jugador.nombre}
-                </span>
-                {/* Mostrar saldo del jugador si está disponible */}
-                <span className="text-xs text-muted-foreground ml-auto">
-                  Saldo: {formatAmount(jugador.balance)}
-                </span>
-              </div>
+          <h4 className="text-sm font-semibold">Jugadores:</h4>
+
+          <div className="space-y-2">
+            {jugadores.map((jugador, index) => (<div key={jugador.id} className="flex items-center gap-2">
+              <p>{index + 1}. </p>
+              <Avatar className="w-6 h-6">
+                <AvatarFallback className="text-xs">{jugador.nombre.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <span className="text-sm">
+                {jugador.nombre}
+              </span>
+
+              {/* Mostrar dinero del jugador si está disponible */}
+              <span className="text-xs text-muted-foreground ml-auto">
+                Dinero: {formatAmount(jugador.balance)}
+              </span>
+
+              {/* Botón para eliminar jugador - solo visible para el creador y si la sala está abierta */}
+              {isOwner && sala.estado === SALA_ESTADO.ABIERTA && jugador.id !== user?.id && (
+                <BtnEliminarJugador
+                  salaId={sala.id}
+                  jugadorId={jugador.id}
+                  jugadorNombre={jugador.nombre}
+                />
+              )}
+            </div>
             ))}
           </div>
         </div>

@@ -26,6 +26,7 @@ export default function FormNuevaSala ({ idJugador }: { idJugador: string }) {
 
       <Form className='flex flex-col gap-2' action={formAction}>
         <Input type='text' required name='nombre' placeholder='Nombre de la sala' />
+
         <Select required name='visualizacion' defaultValue={SALA_VISUALIZACION.PUBLICA}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Visualización (Pública o Privada)" />
@@ -36,11 +37,6 @@ export default function FormNuevaSala ({ idJugador }: { idJugador: string }) {
           </SelectContent>
         </Select>
 
-        {state?.data && (
-          <p>
-            Código de sala: {state.data.codigo_sala}
-          </p>
-        )}
         <Input type='hidden' name='jugador_id' value={idJugador} />
 
         <Button type='submit' disabled={isPending}>
