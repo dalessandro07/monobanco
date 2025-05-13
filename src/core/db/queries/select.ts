@@ -13,6 +13,15 @@ export async function getSalaPorId (salaId: string) {
   return sala[0]
 }
 
+export async function getSalaPorCodigo (codigoSala: string) {
+  const sala = await db.select()
+    .from(salasTable)
+    .where(eq(salasTable.codigo_sala, codigoSala))
+    .limit(1)
+
+  return sala[0]
+}
+
 export async function getAllSalasActivas () {
   // Usamos SALA_ESTADO y SALA_VISUALIZACION para mayor claridad y consistencia
   const salas = await db.select({
@@ -148,6 +157,20 @@ export async function getSalaActivaPorJugadorId (jugadorId: string) {
 }
 
 //! JUGADORES
+export async function getCreadorDeSalaPorId (salaId: string) {
+  const creador = await db.select({
+    id: jugadoresTable.id,
+    nombre: jugadoresTable.nombre,
+    email: jugadoresTable.email
+  })
+    .from(salasTable)
+    .innerJoin(jugadoresTable, eq(salasTable.created_by, jugadoresTable.id))
+    .where(eq(salasTable.id, salaId))
+    .limit(1)
+
+  return creador[0]
+}
+
 export async function getAllJugadoresPorSalaId (salaId: string) {
   // Optimizando la selección para traer solo los campos necesarios
   const jugadores = await db.select({

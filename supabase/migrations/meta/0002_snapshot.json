@@ -1,6 +1,6 @@
 {
-  "id": "e8ead30b-b3f9-441d-8667-be51bb16d2c0",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "cf31b92a-c654-41c8-b765-d6b4e006ef1c",
+  "prevId": "db0fcf96-63dc-4597-9f9c-d5b980950af1",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -12,13 +12,13 @@
           "name": "sala_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "jugador_id": {
           "name": "jugador_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "balance": {
           "name": "balance",

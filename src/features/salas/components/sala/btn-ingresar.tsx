@@ -14,7 +14,7 @@ export default function BtnIngresar ({ codigoSala, jugadorId }: { codigoSala: st
   return (
     <Form action={formAction} className="flex gap-2">
       <Button size="sm" type="submit" disabled={isPending}>
-        {isPending ? 'Ingresando...' : 'Ingresar sala'}
+        {isPending ? 'Uniendo...' : 'Unirme a la sala'}
       </Button>
     </Form>
   )

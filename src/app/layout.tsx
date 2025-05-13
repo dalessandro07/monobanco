@@ -35,7 +35,7 @@ export default function RootLayout ({
       <head>
         <meta name="apple-mobile-web-app-title" content={APP_NAME} />
       </head>
-      <body className={`${monopolyFont.className}`}>
+      <body className={`${monopolyFont.className} dark`}>
         <div className='flex flex-col gap-5 p-5 min-h-dvh'>
           <Header />
 

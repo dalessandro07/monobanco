@@ -8,6 +8,7 @@ import type { SelectSala } from '@/core/db/schema'
 import type { SALA_VISUALIZACION } from '@/core/lib/constants'
 import { getUser } from '@/features/auth/actions'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 //! HELPERS
 async function verificarUsuario () {
@@ -137,6 +138,7 @@ export async function actionIngresarSala (codigoSala: string, jugadorId: string)
     }
   } finally {
     revalidatePath('/')
+    redirect(`/salas/${codigoSala}`)
   }
 }
 

@@ -1,6 +1,6 @@
 {
-  "id": "e8ead30b-b3f9-441d-8667-be51bb16d2c0",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "db0fcf96-63dc-4597-9f9c-d5b980950af1",
+  "prevId": "e8ead30b-b3f9-441d-8667-be51bb16d2c0",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -54,7 +54,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         },
         "jugadores_salas_table_jugador_id_jugadores_table_id_fk": {

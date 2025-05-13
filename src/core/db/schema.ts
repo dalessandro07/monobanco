@@ -1,6 +1,6 @@
 import { SALA_ESTADO, SALA_VISUALIZACION } from '@/core/lib/constants'
 import { sql } from 'drizzle-orm'
-import { check, pgTable, primaryKey, real, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { check, integer, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 //! Tablas para MonoBanco (Banca electrónica para Monopoly)
 
@@ -30,9 +30,9 @@ export const salasTable = pgTable('salas_table', {
 
 //* 3. Jugadores de sala + saldo
 export const jugadoresSalasTable = pgTable('jugadores_salas_table', {
-  sala_id: uuid('sala_id').references(() => salasTable.id, { onDelete: 'cascade' }),
-  jugador_id: uuid('jugador_id').references(() => jugadoresTable.id),
-  balance: real('balance').notNull().default(0.0),
+  sala_id: uuid('sala_id').references(() => salasTable.id, { onDelete: 'cascade' }).notNull(),
+  jugador_id: uuid('jugador_id').references(() => jugadoresTable.id).notNull(),
+  balance: integer('balance').notNull().default(1500),
   created_at: timestamp('created_at').notNull().defaultNow(),
   updated_at: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),
 }, (table) => [
@@ -51,7 +51,7 @@ export const transaccionesTable = pgTable('transacciones_table', {
   sala_id: uuid('sala_id').references(() => salasTable.id),
   jugador_origen_id: uuid('jugador_origen_id').notNull().references(() => jugadoresTable.id),
   jugador_destino_id: uuid('jugador_destino_id').references(() => jugadoresTable.id),
-  monto: real('monto').notNull(),
+  monto: integer('monto').notNull(),
   tipo: text('tipo', { enum: ['DEPOSITO-BANCO', 'RETIRO-BANCO', 'TRANSFERENCIA'] }).notNull(),
   created_at: timestamp('created_at').notNull().defaultNow(),
   updated_at: timestamp('updated_at').notNull().defaultNow().$onUpdate(() => new Date()),

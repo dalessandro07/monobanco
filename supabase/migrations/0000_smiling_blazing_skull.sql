@@ -1,7 +1,7 @@
 CREATE TABLE "jugadores_salas_table" (
 	"sala_id" uuid,
 	"jugador_id" uuid,
-	"balance" real DEFAULT 0 NOT NULL,
+	"balance" integer DEFAULT 1500 NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "jugadores_salas_table_sala_id_jugador_id_pk" PRIMARY KEY("sala_id","jugador_id"),
@@ -34,7 +34,7 @@ CREATE TABLE "transacciones_table" (
 	"sala_id" uuid,
 	"jugador_origen_id" uuid NOT NULL,
 	"jugador_destino_id" uuid,
-	"monto" real NOT NULL,
+	"monto" integer NOT NULL,
 	"tipo" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL

@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback } from '@/core/components/ui/avatar'
 import { Badge } from '@/core/components/ui/badge'
+import { buttonVariants } from '@/core/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/core/components/ui/card'
 import { getAllJugadoresPorSalaId } from '@/core/db/queries/select'
 import type { SelectSala } from '@/core/db/schema'
@@ -11,6 +12,8 @@ import BtnCerrar from '@/features/salas/components/sala/btn-cerrar'
 import BtnEliminar from '@/features/salas/components/sala/btn-eliminar'
 import BtnEliminarJugador from '@/features/salas/components/sala/btn-eliminar-jugador'
 import BtnIngresar from '@/features/salas/components/sala/btn-ingresar'
+import { BanknoteIcon } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function ListaItemSala ({
   sala
@@ -30,15 +33,19 @@ export default async function ListaItemSala ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col gap-2">
-          <CardTitle>
-            Sala: {sala.nombre}
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>
+              Sala: {sala.nombre}
+            </CardTitle>
+
             {isOwner && (
-              <Badge className="ml-2" variant="outline">
+              <p className='bg-accent text-accent-foreground p-2 rounded-md'>
                 Código: {sala.codigo_sala}
-              </Badge>
+              </p>
             )}
-          </CardTitle>
+          </div>
+
           <p className="text-sm text-muted-foreground">
             Creada por: {creadorNombre} el {formatDate(sala.created_at)}
           </p>
@@ -106,6 +113,15 @@ export default async function ListaItemSala ({
           </div>
         </div>
       </CardContent>
+
+      {isPlayer && sala.estado === SALA_ESTADO.ABIERTA && (
+        <CardFooter className="flex justify-end">
+          <Link className={buttonVariants()} href={`/salas/${sala.codigo_sala}`}>
+            <BanknoteIcon />
+            Ir al juego
+          </Link>
+        </CardFooter>
+      )}
 
       {/* Si el jugador no está en la sala y está abierta, se muestra el botón de ingresar a la sala */}
       {!isPlayer && sala.estado === SALA_ESTADO.ABIERTA && user?.id && (

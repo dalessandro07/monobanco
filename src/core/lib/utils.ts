@@ -76,3 +76,9 @@ export const tiempoJuego = (closedAt: Date | null, createdAt: Date) => {
     finalTextoJuego
   }
 }
+
+//* Validaciones
+export const isValidCodigoSala = (codigo: string) => {
+  const regex = /^[a-zA-Z0-9]{6}$/
+  return regex.test(codigo)
+}
