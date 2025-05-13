@@ -2,46 +2,47 @@ import { Avatar, AvatarFallback } from '@/core/components/ui/avatar'
 import { Badge } from '@/core/components/ui/badge'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/core/components/ui/card'
 import { getAllJugadoresPorSalaId } from '@/core/db/queries/select'
-import type { SelectJugador, SelectSala } from '@/core/db/schema'
+import type { SelectSala } from '@/core/db/schema'
 import { SALA_ESTADO } from '@/core/lib/constants'
-import { formatDate, tiempoJuego } from '@/core/lib/utils'
+import { formatAmount, formatDate, tiempoJuego } from '@/core/lib/utils'
 import { getUser } from '@/features/auth/actions'
 import BtnCerrar from '@/features/salas/components/sala/btn-cerrar'
 import BtnEliminar from '@/features/salas/components/sala/btn-eliminar'
+import BtnIngresar from '@/features/salas/components/sala/btn-ingresar'
 
 export default async function ListaItemSala ({
   sala
 }: {
-  sala: {
-    salas_table: SelectSala
-    jugadores_table: SelectJugador
-  }
+  sala: SelectSala
 }) {
   const { data: user } = await getUser()
-  const isOwner = user?.id === sala.salas_table.created_by
 
-  const jugadores = await getAllJugadoresPorSalaId(sala.salas_table.id)
+  const jugadores = await getAllJugadoresPorSalaId(sala.id)
+  const isOwner = user?.id === sala.created_by
+  const isPlayer = jugadores.some((jugador) => jugador.id === user?.id)
 
-  const { minutosJuego, finalTextoJuego } = tiempoJuego(sala.salas_table.closed_at, sala.salas_table.created_at)
+  const { minutosJuego, finalTextoJuego } = tiempoJuego(sala.closed_at, sala.created_at)
+
+  const creadorNombre = jugadores.find((jugador) => jugador.id === sala.created_by)?.nombre || 'Desconocido'
 
   return (
     <Card>
       <CardHeader>
         <div className="flex flex-col gap-2">
           <CardTitle>
-            Sala: {sala.salas_table.nombre}
+            Sala: {sala.nombre}
             {isOwner && (
               <Badge className="ml-2" variant="outline">
-                Código: {sala.salas_table.codigo_sala}
+                Código: {sala.codigo_sala}
               </Badge>
             )}
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Creada por: {sala.jugadores_table.nombre} el {formatDate(sala.salas_table.created_at)}
+            Creada por: {creadorNombre} el {formatDate(sala.created_at)}
           </p>
-          {sala.salas_table.closed_at && (
+          {sala.closed_at && (
             <p className="text-sm text-muted-foreground">
-              Cerrada por: {sala.jugadores_table.nombre} el {formatDate(sala.salas_table.closed_at)}
+              Cerrada por: {creadorNombre} el {formatDate(sala.closed_at)}
             </p>
           )}
           {minutosJuego > 0 && (
@@ -49,28 +50,40 @@ export default async function ListaItemSala ({
               Tiempo de juego: {finalTextoJuego}
             </p>
           )}
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-muted-foreground">Estado:</p>
-            <Badge variant={sala.salas_table.estado === SALA_ESTADO.ABIERTA ? 'default' : 'destructive'}>
-              {sala.salas_table.estado}
-            </Badge>
+
+          <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">Estado:</p>
+              <Badge variant={sala.estado === SALA_ESTADO.ABIERTA ? 'default' : 'destructive'}>
+                {sala.estado}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">Visualización:</p>
+              <Badge className='uppercase'>
+                {sala.visualizacion}
+              </Badge>
+            </div>
           </div>
         </div>
       </CardHeader>
 
       <CardContent>
         <div className='flex flex-col gap-2'>
-          <h4 className="text-sm font-semibold">Jugadores:</h4>
-
-          <div className="space-y-2">
+          <h4 className="text-sm font-semibold">Jugadores:</h4>          <div className="space-y-2">
             {jugadores.map((jugador, index) => (
-              <div key={jugador.jugadores_table.id} className="flex items-center gap-2">
+              <div key={jugador.id} className="flex items-center gap-2">
                 <p>{index + 1}. </p>
                 <Avatar className="w-6 h-6">
-                  <AvatarFallback className="text-xs">{jugador.jugadores_table.nombre.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-xs">{jugador.nombre.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm">
-                  {jugador.jugadores_table.nombre}
+                  {jugador.nombre}
+                </span>
+                {/* Mostrar saldo del jugador si está disponible */}
+                <span className="text-xs text-muted-foreground ml-auto">
+                  Saldo: {formatAmount(jugador.balance)}
                 </span>
               </div>
             ))}
@@ -78,15 +91,24 @@ export default async function ListaItemSala ({
         </div>
       </CardContent>
 
-      {sala.salas_table.estado === SALA_ESTADO.ABIERTA && user?.id && (
+      {/* Si el jugador no está en la sala y está abierta, se muestra el botón de ingresar a la sala */}
+      {!isPlayer && sala.estado === SALA_ESTADO.ABIERTA && user?.id && (
         <CardFooter className="flex justify-end">
-          <BtnCerrar salaId={sala.salas_table.id} jugadorId={user?.id} isOwner={isOwner} />
+          <BtnIngresar codigoSala={sala.codigo_sala} jugadorId={user?.id} />
         </CardFooter>
       )}
 
-      {isOwner && sala.salas_table.estado === SALA_ESTADO.CERRADA && (
+      {/* Si el jugador es creador o participante de la sala, se muestra el botón de cerrar o abandonar sala */}
+      {(isOwner || isPlayer) && sala.estado === SALA_ESTADO.ABIERTA && (
         <CardFooter className="flex justify-end">
-          <BtnEliminar salaId={sala.salas_table.id} jugadorId={user?.id} />
+          <BtnCerrar salaId={sala.id} jugadorId={user?.id} isOwner={isOwner} />
+        </CardFooter>
+      )}
+
+      {/* Si el jugador es el creador de la sala y la sala está cerrada, se muestra el botón de eliminar sala */}
+      {isOwner && sala.estado === SALA_ESTADO.CERRADA && (
+        <CardFooter className="flex justify-end">
+          <BtnEliminar salaId={sala.id} jugadorId={user?.id} />
         </CardFooter>
       )}
     </Card>

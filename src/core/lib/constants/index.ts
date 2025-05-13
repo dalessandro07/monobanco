@@ -7,3 +7,8 @@ export enum SALA_ESTADO {
   ABIERTA = 'ABIERTA',
   CERRADA = 'CERRADA'
 }
+
+export enum SALA_VISUALIZACION {
+  PUBLICA = 'PUBLICA',
+  PRIVADA = 'PRIVADA'
+}

@@ -30,6 +30,17 @@ export const randomName = (length: number) => {
   return shortName
 }
 
+export const formatAmount = (amount: number | string) => {
+  const amountString = amount.toString() ?? '0'
+
+  return new Intl.NumberFormat('es-PE', {
+    style: 'currency',
+    currency: 'PEN',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Number(amountString))
+}
+
 //* Dates
 export const formatDate = (date: DateInput, formatStyle?: Format) => {
   let finalStyle: Format = {

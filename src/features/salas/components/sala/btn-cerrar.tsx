@@ -9,7 +9,7 @@ import { useActionState } from 'react'
 
 interface IBtnCerrarProps {
   salaId: string
-  jugadorId: string
+  jugadorId?: string
   isOwner: boolean
 }
 
@@ -18,10 +18,17 @@ export default function BtnCerrar ({
   jugadorId,
   isOwner
 }: IBtnCerrarProps) {
-  let handleAction = () => actionCerrarSala(salaId, jugadorId)
+  function handleAction () {
+    if (!jugadorId) return {
+      success: false,
+      message: 'No se ha podido obtener el ID del jugador'
+    }
 
-  if (!isOwner) {
-    handleAction = () => actionAbandonarSala(salaId, jugadorId)
+    if (isOwner) {
+      return actionCerrarSala(salaId, jugadorId)
+    } else {
+      return actionAbandonarSala(salaId, jugadorId)
+    }
   }
 
   const [state, formAction, isPending] = useActionState(handleAction, null)

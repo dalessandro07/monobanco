@@ -61,3 +61,9 @@ export type SelectJugador = typeof jugadoresTable.$inferSelect
 
 export type InsertSala = typeof salasTable.$inferInsert
 export type SelectSala = typeof salasTable.$inferSelect
+
+export type SelectJugadoresSalas = typeof jugadoresSalasTable.$inferSelect
+export type InsertJugadoresSalas = typeof jugadoresSalasTable.$inferInsert
+
+export type SelectTransacciones = typeof transaccionesTable.$inferSelect
+export type InsertTransacciones = typeof transaccionesTable.$inferInsert

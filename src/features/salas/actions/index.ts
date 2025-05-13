@@ -2,14 +2,13 @@
 
 import { eliminarJugadorDeSala, eliminarSala } from '@/core/db/queries/delete'
 import { agregarJugadorASala, crearJugador, crearSala } from '@/core/db/queries/insert'
-import { getAllSalasAbiertasPorJugadorId, getJugadorPorId } from '@/core/db/queries/select'
+import { getJugadorPorId, getSalaActivaPorJugadorId } from '@/core/db/queries/select'
 import { cerrarSala } from '@/core/db/queries/update'
 import type { SelectSala } from '@/core/db/schema'
 import { getUser } from '@/features/auth/actions'
 import { revalidatePath } from 'next/cache'
 
-//! GESTIONAR SALAS
-
+//! HELPERS
 async function verificarUsuario () {
   // Obtenemos datos del usuario autenticado
   const { data: usuario } = await getUser()
@@ -28,6 +27,7 @@ async function verificarUsuario () {
   }
 }
 
+//! GESTIONAR SALAS
 export async function actionCrearSala (initialState: unknown, formData: FormData) {
   try {
     const { data: usuario } = await verificarUsuario()
@@ -42,14 +42,12 @@ export async function actionCrearSala (initialState: unknown, formData: FormData
         success: false,
         message: 'Faltan datos para crear la sala.'
       }
-    }
-
-    // Validamos que el usuario no tenga salas activas
-    const salasPrevias = await getAllSalasAbiertasPorJugadorId(creadorId)
-    if (salasPrevias.length > 0) {
+    }    // Validamos que el usuario no participe en alguna sala activa
+    const salaActiva = await getSalaActivaPorJugadorId(creadorId)
+    if (salaActiva) {
       return {
         success: false,
-        message: 'Ya tienes una sala activa. Puedes crear una nueva sala cuando abandones la actual.'
+        message: 'Ya participas en una sala activa. Puedes crear una nueva sala cuando abandones la actual.'
       }
     }
 
@@ -73,7 +71,7 @@ export async function actionCrearSala (initialState: unknown, formData: FormData
     await crearSala(sala)
 
     // Vinculamos el jugador a la sala
-    await agregarJugadorASala(sala.id, jugador.id)
+    await agregarJugadorASala(sala.codigo_sala, jugador.id)
 
     return {
       success: true,
@@ -92,11 +90,8 @@ export async function actionCrearSala (initialState: unknown, formData: FormData
   }
 }
 
-export async function actionIngresarSala (initialState: unknown, formData: FormData) {
+export async function actionIngresarSala (codigoSala: string, jugadorId: string) {
   const { data: usuario } = await verificarUsuario()
-
-  const codigoSala = formData.get('codigo_sala') as string
-  const jugadorId = formData.get('jugador_id') as string
 
   // Validamos que no faltan datos
   if (!codigoSala || !jugadorId || !usuario) {
@@ -105,14 +100,14 @@ export async function actionIngresarSala (initialState: unknown, formData: FormD
       message: 'Faltan datos para ingresar a la sala'
     }
   }
-
   try {
-    // Validamos que el usuario no tenga salas activas
-    const salasPrevias = await getAllSalasAbiertasPorJugadorId(usuario.id)
-    if (salasPrevias.length > 0) {
+    // Validamos que el usuario no esté en una sala activa
+    const salaActiva = await getSalaActivaPorJugadorId(jugadorId)
+
+    if (salaActiva) {
       return {
         success: false,
-        message: 'Ya tienes una sala activa. Puedes ingresar a una nueva sala cuando abandones la actual.'
+        message: 'Ya estás en una sala activa. Puedes ingresar a una nueva cuando abandones la sala actual.'
       }
     }
 
@@ -128,6 +123,7 @@ export async function actionIngresarSala (initialState: unknown, formData: FormD
 
     return {
       success: true,
+      message: `Has ingresado a la sala #${codigoSala} correctamente`,
       data
     }
   } catch (error) {

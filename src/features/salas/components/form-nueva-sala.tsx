@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/core/components/ui/select"
 import useToastMessage from '@/core/hooks/useToastMessage'
+import { SALA_VISUALIZACION } from '@/core/lib/constants'
 import { actionCrearSala } from '@/features/salas/actions'
 import Form from 'next/form'
 import { useActionState } from 'react'
@@ -25,13 +26,13 @@ export default function FormNuevaSala ({ idJugador }: { idJugador: string }) {
 
       <Form className='flex flex-col gap-2' action={formAction}>
         <Input type='text' required name='nombre' placeholder='Nombre de la sala' />
-        <Select required name='visualizacion' defaultValue='publica'>
+        <Select required name='visualizacion' defaultValue={SALA_VISUALIZACION.PUBLICA}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Visualización (Pública o Privada)" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="publica">Pública</SelectItem>
-            <SelectItem value="privada">Privada</SelectItem>
+            <SelectItem value={SALA_VISUALIZACION.PUBLICA}>Pública</SelectItem>
+            <SelectItem value={SALA_VISUALIZACION.PRIVADA}>Privada</SelectItem>
           </SelectContent>
         </Select>
 

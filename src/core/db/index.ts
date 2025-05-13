@@ -10,5 +10,5 @@ if (!DATABASE_URL) {
   throw new Error('No se encontró la variable de entorno DATABASE_URL.')
 }
 
-const client = postgres(DATABASE_URL)
+const client = postgres(DATABASE_URL, { prepare: false })
 export const db = drizzle({ client })
