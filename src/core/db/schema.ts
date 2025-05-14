@@ -1,11 +1,11 @@
-import { JUGADOR_SALA_ESTADO, SALA_ESTADO, SALA_VISUALIZACION, TRANSACCION_TIPO } from '@/core/lib/constants'
+import { JUGADOR_SALA_ESTADO, JUGADORES_SALAS_TABLE_NAME, JUGADORES_TABLE_NAME, SALA_ESTADO, SALA_VISUALIZACION, SALAS_TABLE_NAME, TRANSACCION_TIPO, TRANSACCIONES_TABLE_NAME } from '@/core/lib/constants'
 import { sql } from 'drizzle-orm'
 import { check, integer, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 //! Tablas para MonoBanco (Banca electrónica para Monopoly)
 
 //* 1. Jugadores
-export const jugadoresTable = pgTable('jugadores_table', {
+export const jugadoresTable = pgTable(JUGADORES_TABLE_NAME, {
   id: uuid('id').primaryKey().defaultRandom(),
   nombre: text('nombre').notNull(),
   email: text('email').notNull().unique(),
@@ -13,7 +13,7 @@ export const jugadoresTable = pgTable('jugadores_table', {
 })
 
 //* 2. Salas
-export const salasTable = pgTable('salas_table', {
+export const salasTable = pgTable(SALAS_TABLE_NAME, {
   id: uuid('id').primaryKey().defaultRandom(),
   nombre: text('nombre').notNull(),
   codigo_sala: text('codigo_sala').notNull().unique().$defaultFn(() => {
@@ -29,7 +29,7 @@ export const salasTable = pgTable('salas_table', {
 })
 
 //* 3. Jugadores de sala + saldo
-export const jugadoresSalasTable = pgTable('jugadores_salas_table', {
+export const jugadoresSalasTable = pgTable(JUGADORES_SALAS_TABLE_NAME, {
   sala_id: uuid('sala_id').references(() => salasTable.id, { onDelete: 'cascade' }).notNull(),
   jugador_id: uuid('jugador_id').references(() => jugadoresTable.id).notNull(),
   balance: integer('balance').notNull().default(1500),
@@ -45,9 +45,9 @@ export const jugadoresSalasTable = pgTable('jugadores_salas_table', {
 // 1. DEPOSITO-BANCO: Deposito del banco a un jugador
 // 2. RETIRO-BANCO: Retiro de un jugador al banco
 // 3. TRANSFERENCIA: Transferencia de dinero entre dos jugadores
-export const transaccionesTable = pgTable('transacciones_table', {
+export const transaccionesTable = pgTable(TRANSACCIONES_TABLE_NAME, {
   id: uuid('id').primaryKey().defaultRandom(),
-  sala_id: uuid('sala_id').references(() => salasTable.id),
+  sala_id: uuid('sala_id').references(() => salasTable.id, { onDelete: 'cascade' }).notNull(),
   jugador_origen_id: uuid('jugador_origen_id').notNull().references(() => jugadoresTable.id),
   jugador_destino_id: uuid('jugador_destino_id').references(() => jugadoresTable.id),
   monto: integer('monto').notNull(),
@@ -67,3 +67,12 @@ export type InsertJugadoresSalas = typeof jugadoresSalasTable.$inferInsert
 
 export type SelectTransacciones = typeof transaccionesTable.$inferSelect
 export type InsertTransacciones = typeof transaccionesTable.$inferInsert
+
+export type TJugador = {
+  id: string,
+  nombre: string,
+  email: string,
+  balance: number,
+  estado: number,
+  created_at: Date,
+}

@@ -1,5 +1,5 @@
 import { getTransaccionesPorSalaId } from '@/core/db/queries/select'
-import type { SelectJugador, SelectSala } from '@/core/db/schema'
+import type { SelectSala, TJugador } from '@/core/db/schema'
 import { formatAmount, formatDate } from '@/core/lib/utils'
 
 export default async function ListaTransacciones ({
@@ -7,7 +7,7 @@ export default async function ListaTransacciones ({
   jugadoresPorSala
 }: {
   sala: SelectSala
-  jugadoresPorSala: (SelectJugador & { balance: number, estado: number })[]
+  jugadoresPorSala: TJugador[]
 }) {
   // Obtener las transacciones de la sala
   const transacciones = await getTransaccionesPorSalaId(sala.id)

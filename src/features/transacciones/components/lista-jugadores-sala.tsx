@@ -1,11 +1,11 @@
-import type { SelectJugador } from '@/core/db/schema'
+import type { TJugador } from '@/core/db/schema'
 import { JUGADOR_SALA_ESTADO } from '@/core/lib/constants'
 import { formatAmount } from '@/core/lib/utils'
 
 export default function ListaJugadoresSala ({
   jugadoresPorSala
 }: {
-  jugadoresPorSala: (SelectJugador & { balance: number, estado: number })[]
+  jugadoresPorSala: TJugador[]
 }) {
   return (
     <article className='flex flex-col gap-2'>

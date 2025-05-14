@@ -2,6 +2,12 @@ export const APP_NAME = "MonoBanco"
 export const APP_DESCRIPTION = "Aplicación web para gestionar el dinero de una partida de Monopoly."
 export const APP_EMAIL = "dev.alessandro@outlook.com"
 
+//* BASE DE DATOS
+export const JUGADORES_TABLE_NAME = "jugadores_table"
+export const SALAS_TABLE_NAME = "salas_table"
+export const JUGADORES_SALAS_TABLE_NAME = "jugadores_salas_table"
+export const TRANSACCIONES_TABLE_NAME = "transacciones_table"
+
 //* SALAS
 export enum SALA_ESTADO {
   ABIERTA = 'ABIERTA',
