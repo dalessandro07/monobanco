@@ -1,6 +1,6 @@
 import { db } from '@/core/db'
-import { jugadoresSalasTable, jugadoresTable, salasTable } from '@/core/db/schema'
-import { SALA_ESTADO, SALA_VISUALIZACION } from '@/core/lib/constants'
+import { jugadoresSalasTable, jugadoresTable, salasTable, transaccionesTable } from '@/core/db/schema'
+import { JUGADOR_SALA_ESTADO, SALA_ESTADO, SALA_VISUALIZACION } from '@/core/lib/constants'
 import { and, desc, eq, exists, or } from 'drizzle-orm'
 
 //! SALAS
@@ -130,30 +130,21 @@ export async function getAllSalasCerradasPorJugadorId (jugadorId: string) {
   return salas
 }
 
-export async function getSalaActivaPorJugadorId (jugadorId: string) {
+export async function getJugadorTieneSalaActiva (jugadorId: string) {
   // Primero, obtener el ID de la sala más reciente donde el usuario participa
-  const salaId = await db
+  const salaActiva = await db
     .select({ id: salasTable.id })
     .from(salasTable)
     .innerJoin(jugadoresSalasTable, eq(salasTable.id, jugadoresSalasTable.sala_id))
     .where(and(
       eq(jugadoresSalasTable.jugador_id, jugadorId),
+      eq(jugadoresSalasTable.estado, JUGADOR_SALA_ESTADO.ACTIVO),
       eq(salasTable.estado, SALA_ESTADO.ABIERTA)
     ))
     .orderBy(desc(salasTable.created_at))
     .limit(1)
 
-  // Si no hay resultados, devolver null
-  if (!salaId[0]) return null
-
-  // Luego, obtener los detalles completos de esa sala específica
-  const sala = await db
-    .select()
-    .from(salasTable)
-    .where(eq(salasTable.id, salaId[0].id))
-    .limit(1)
-
-  return sala[0]
+  return Boolean(salaActiva[0])
 }
 
 //! JUGADORES
@@ -171,23 +162,6 @@ export async function getCreadorDeSalaPorId (salaId: string) {
   return creador[0]
 }
 
-export async function getAllJugadoresPorSalaId (salaId: string) {
-  // Optimizando la selección para traer solo los campos necesarios
-  const jugadores = await db.select({
-    id: jugadoresTable.id,
-    nombre: jugadoresTable.nombre,
-    email: jugadoresTable.email,
-    balance: jugadoresSalasTable.balance,
-    created_at: jugadoresSalasTable.created_at
-  })
-    .from(jugadoresSalasTable)
-    .innerJoin(jugadoresTable, eq(jugadoresSalasTable.jugador_id, jugadoresTable.id))
-    .where(eq(jugadoresSalasTable.sala_id, salaId))
-    .orderBy(desc(jugadoresSalasTable.created_at))
-
-  return jugadores
-}
-
 export async function getJugadorPorId (jugadorId: string) {
   const jugador = await db.select()
     .from(jugadoresTable)
@@ -195,4 +169,89 @@ export async function getJugadorPorId (jugadorId: string) {
     .limit(1)
 
   return jugador[0]
+}
+
+//! JUGADORES y SALAS
+export async function getAllJugadoresActivosPorSalaId (salaId: string) {
+  // Optimizando la selección para traer solo los campos necesarios
+  const jugadores = await db.select({
+    id: jugadoresTable.id,
+    nombre: jugadoresTable.nombre,
+    email: jugadoresTable.email,
+    balance: jugadoresSalasTable.balance,
+    created_at: jugadoresSalasTable.created_at,
+  })
+    .from(jugadoresSalasTable)
+    .innerJoin(jugadoresTable, eq(jugadoresSalasTable.jugador_id, jugadoresTable.id))
+    .where(
+      and(
+        eq(jugadoresSalasTable.sala_id, salaId),
+        eq(jugadoresSalasTable.estado, JUGADOR_SALA_ESTADO.ACTIVO)
+      )
+    )
+    .orderBy(desc(jugadoresSalasTable.created_at))
+
+  return jugadores
+}
+
+export async function getAllJugadoresPorSalaId (salaId: string) {
+  // Optimizando la selección para traer solo los campos necesarios
+  const jugadores = await db.select({
+    id: jugadoresTable.id,
+    nombre: jugadoresTable.nombre,
+    email: jugadoresTable.email,
+    balance: jugadoresSalasTable.balance,
+    estado: jugadoresSalasTable.estado,
+    created_at: jugadoresSalasTable.created_at,
+  })
+    .from(jugadoresSalasTable)
+    .innerJoin(jugadoresTable, eq(jugadoresSalasTable.jugador_id, jugadoresTable.id))
+    .where(
+      and(
+        eq(jugadoresSalasTable.sala_id, salaId)
+      )
+    )
+    .orderBy(desc(jugadoresSalasTable.created_at))
+
+  return jugadores
+}
+
+export async function getJugadorPorSalaId (salaId: string, jugadorId: string) {
+  const jugador = await db.select()
+    .from(jugadoresSalasTable)
+    .where(
+      and(
+        eq(jugadoresSalasTable.sala_id, salaId),
+        eq(jugadoresSalasTable.jugador_id, jugadorId)
+      )
+    )
+    .limit(1)
+
+  return jugador[0]
+}
+
+//! TRANSACCIONES
+export async function getTransaccionesPorJugadorId (jugadorId: string) {
+  const transacciones = await db
+    .select()
+    .from(transaccionesTable)
+    .where(
+      or(
+        eq(transaccionesTable.jugador_origen_id, jugadorId),
+        eq(transaccionesTable.jugador_destino_id, jugadorId)
+      )
+    )
+    .orderBy(desc(transaccionesTable.created_at))
+
+  return transacciones
+}
+
+export async function getTransaccionesPorSalaId (salaId: string) {
+  const transacciones = await db
+    .select()
+    .from(transaccionesTable)
+    .where(eq(transaccionesTable.sala_id, salaId))
+    .orderBy(desc(transaccionesTable.created_at))
+
+  return transacciones
 }

@@ -1,5 +1,8 @@
 import { db } from '@/core/db'
-import { jugadoresSalasTable, jugadoresTable, salasTable, type InsertSala } from '@/core/db/schema'
+import { getJugadorPorSalaId } from '@/core/db/queries/select'
+import { cambiarEstadoJugador } from '@/core/db/queries/update'
+import { jugadoresSalasTable, jugadoresTable, salasTable, transaccionesTable, type InsertSala, type InsertTransacciones } from '@/core/db/schema'
+import { JUGADOR_SALA_ESTADO } from '@/core/lib/constants'
 import { randomName } from '@/core/lib/utils'
 import type { User } from '@supabase/supabase-js'
 import { eq } from 'drizzle-orm'
@@ -41,12 +44,39 @@ export async function agregarJugadorASala (codigoSala: string, jugadorId: string
     throw new Error('La sala no está abierta')
   }
 
-  const nuevoJugador = await db.insert(jugadoresSalasTable)
+  // Verificamos si el jugador ya está en la sala
+  const jugadorEnSala = await getJugadorPorSalaId(sala[0].id, jugadorId)
+
+  if (jugadorEnSala) {
+    // Si el jugador ya está en la sala, verificamos si está activo
+    if (jugadorEnSala.estado === JUGADOR_SALA_ESTADO.ACTIVO) {
+      throw new Error('El jugador ya está en la sala')
+    }
+
+    // Si el jugador no está activo, lo activamos y retornamos
+    await cambiarEstadoJugador(sala[0].id, jugadorId, JUGADOR_SALA_ESTADO.ACTIVO)
+
+    return jugadorEnSala
+  }
+
+  const nuevoJugador = await db
+    .insert(jugadoresSalasTable)
     .values({
       jugador_id: jugadorId,
-      sala_id: sala[0].id
+      sala_id: sala[0].id,
+      estado: JUGADOR_SALA_ESTADO.ACTIVO
     })
     .returning()
 
   return nuevoJugador[0]
+}
+
+//! TRANSACCIONES
+export async function crearTransaccion (transaccion: InsertTransacciones) {
+  const nuevaTransaccion = await db
+    .insert(transaccionesTable)
+    .values(transaccion)
+    .returning()
+
+  return nuevaTransaccion[0]
 }

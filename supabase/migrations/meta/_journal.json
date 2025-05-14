@@ -22,6 +22,27 @@
       "when": 1747170347796,
       "tag": "0002_soft_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1747172535144,
+      "tag": "0003_hot_iceman",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1747180743712,
+      "tag": "0004_busy_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1747182454993,
+      "tag": "0005_brave_jean_grey",
+      "breakpoints": true
     }
   ]
 }

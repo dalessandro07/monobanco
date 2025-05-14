@@ -1,0 +1,1 @@
+ALTER TABLE "jugadores_salas_table" ADD COLUMN "activo" integer DEFAULT 1 NOT NULL;

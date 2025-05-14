@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback } from '@/core/components/ui/avatar'
 import { Badge } from '@/core/components/ui/badge'
 import { buttonVariants } from '@/core/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/core/components/ui/card'
-import { getAllJugadoresPorSalaId } from '@/core/db/queries/select'
+import { getAllJugadoresActivosPorSalaId } from '@/core/db/queries/select'
 import type { SelectSala } from '@/core/db/schema'
 import { SALA_ESTADO } from '@/core/lib/constants'
 import { formatAmount, formatDate, tiempoJuego } from '@/core/lib/utils'
@@ -22,7 +22,7 @@ export default async function ListaItemSala ({
 }) {
   const { data: user } = await getUser()
 
-  const jugadores = await getAllJugadoresPorSalaId(sala.id)
+  const jugadores = await getAllJugadoresActivosPorSalaId(sala.id)
   const isOwner = user?.id === sala.created_by
   const isPlayer = jugadores.some((jugador) => jugador.id === user?.id)
 

@@ -1,9 +1,9 @@
 'use server'
 
-import { eliminarJugadorDeSala, eliminarSala } from '@/core/db/queries/delete'
+import { eliminarSala } from '@/core/db/queries/delete'
 import { agregarJugadorASala, crearJugador, crearSala } from '@/core/db/queries/insert'
-import { getJugadorPorId, getSalaActivaPorJugadorId } from '@/core/db/queries/select'
-import { cambiarVisualizacionSala, cerrarSala } from '@/core/db/queries/update'
+import { getJugadorPorId, getJugadorTieneSalaActiva } from '@/core/db/queries/select'
+import { cambiarVisualizacionSala, cerrarSala, retirarJugadorDeSala } from '@/core/db/queries/update'
 import type { SelectSala } from '@/core/db/schema'
 import type { SALA_VISUALIZACION } from '@/core/lib/constants'
 import { getUser } from '@/features/auth/actions'
@@ -11,7 +11,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 //! HELPERS
-async function verificarUsuario () {
+export async function verificarUsuario () {
   // Obtenemos datos del usuario autenticado
   const { data: usuario } = await getUser()
 
@@ -44,8 +44,10 @@ export async function actionCrearSala (initialState: unknown, formData: FormData
         success: false,
         message: 'Faltan datos para crear la sala.'
       }
-    }    // Validamos que el usuario no participe en alguna sala activa
-    const salaActiva = await getSalaActivaPorJugadorId(creadorId)
+    }
+
+    // Validamos que el usuario no participe en alguna sala activa
+    const salaActiva = await getJugadorTieneSalaActiva(creadorId)
     if (salaActiva) {
       return {
         success: false,
@@ -92,7 +94,7 @@ export async function actionCrearSala (initialState: unknown, formData: FormData
   }
 }
 
-export async function actionIngresarSala (codigoSala: string, jugadorId: string) {
+export async function actionIngresarSala (codigoSala: string, jugadorId: string, withRedirect = true) {
   const { data: usuario } = await verificarUsuario()
 
   // Validamos que no faltan datos
@@ -104,7 +106,7 @@ export async function actionIngresarSala (codigoSala: string, jugadorId: string)
   }
   try {
     // Validamos que el usuario no esté en una sala activa
-    const salaActiva = await getSalaActivaPorJugadorId(jugadorId)
+    const salaActiva = await getJugadorTieneSalaActiva(jugadorId)
 
     if (salaActiva) {
       return {
@@ -138,7 +140,9 @@ export async function actionIngresarSala (codigoSala: string, jugadorId: string)
     }
   } finally {
     revalidatePath('/')
-    redirect(`/salas/${codigoSala}`)
+    if (withRedirect) {
+      redirect(`/salas/${codigoSala}`)
+    }
   }
 }
 
@@ -151,7 +155,7 @@ export async function actionAbandonarSala (salaId: string, jugadorId: string) {
   }
 
   try {
-    await eliminarJugadorDeSala(salaId, jugadorId)
+    await retirarJugadorDeSala(salaId, jugadorId)
 
     return {
       success: true,
@@ -259,7 +263,7 @@ export async function actionCambiarVisualizacionSala (salaId: string, visualizac
   }
 }
 
-export async function actionEliminarJugadorDeSala (salaId: string, jugadorId: string) {
+export async function actionRetirarJugadorDeSala (salaId: string, jugadorId: string) {
   if (!salaId || !jugadorId) {
     return {
       success: false,
@@ -268,7 +272,7 @@ export async function actionEliminarJugadorDeSala (salaId: string, jugadorId: st
   }
 
   try {
-    const data = await eliminarJugadorDeSala(salaId, jugadorId)
+    const data = await retirarJugadorDeSala(salaId, jugadorId)
 
     if (!data) throw new Error('No se pudo eliminar al jugador de la sala')
 

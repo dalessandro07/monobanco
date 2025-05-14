@@ -1,0 +1,1 @@
+ALTER TABLE "jugadores_salas_table" RENAME COLUMN "activo" TO "estado";

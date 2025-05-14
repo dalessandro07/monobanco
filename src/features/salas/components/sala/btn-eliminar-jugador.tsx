@@ -11,7 +11,7 @@ import {
   DialogTrigger
 } from '@/core/components/ui/dialog'
 import useToastMessage from '@/core/hooks/useToastMessage'
-import { actionEliminarJugadorDeSala } from '@/features/salas/actions'
+import { actionRetirarJugadorDeSala } from '@/features/salas/actions'
 import { Loader2Icon, XIcon } from 'lucide-react'
 import Form from 'next/form'
 import { useActionState, useState } from 'react'
@@ -28,7 +28,7 @@ export default function BtnEliminarJugador ({
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [state, formAction, isPending] = useActionState(
     async () => {
-      const result = await actionEliminarJugadorDeSala(salaId, jugadorId)
+      const result = await actionRetirarJugadorDeSala(salaId, jugadorId)
       if (result.success) {
         setIsDialogOpen(false)
       }

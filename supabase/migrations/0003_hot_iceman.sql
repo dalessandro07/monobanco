@@ -1,0 +1,1 @@
+ALTER TABLE "transacciones_table" ALTER COLUMN "tipo" SET DEFAULT 'TRANSFERENCIA';
